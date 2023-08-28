@@ -3,8 +3,6 @@ import Dragula from 'dragula';
 import 'dragula/dist/dragula.css';
 import Swimlane from './Swimlane';
 import './Board.css';
-
-
 export default class Board extends React.Component {
   constructor(props) {
     super(props);
@@ -22,7 +20,6 @@ export default class Board extends React.Component {
       complete: React.createRef(),
     }
   }
-  
   getClients() {
     return [
       ['1','Stark, White and Abbott','Cloned Optimal Architecture', 'in-progress'],
@@ -55,7 +52,6 @@ export default class Board extends React.Component {
   componentDidMount() {
     this.dragAndDrop();
   }
-
   renderSwimlane(name, clients, ref) {
     return (
       <Swimlane name={name} clients={clients}  dragulaRef={ref}/>
