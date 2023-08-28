@@ -23,46 +23,6 @@ export default class Board extends React.Component {
     }
   }
   
-  componentDidMount() {
-    const containers = [this.swimlanes.backlog.current, this.swimlanes.inProgress.current, this.swimlanes.complete.current];
-    const drake = Dragula(containers);
-
-    drake.on('drop', (el, target, source, sibling) => {
-      const newSwimlaneName = target.getAttribute('data-status');
-      const clientStatus = newSwimlaneName === 'backlog' ? null : newSwimlaneName;
-      const clientId = el.getAttribute('data-id');
-
-      // Create a deep copy of the clients for manipulation
-      const updatedClients = {
-        backlog: [...this.state.clients.backlog],
-        inProgress: [...this.state.clients.inProgress],
-        complete: [...this.state.clients.complete],
-      };
-
-      // Find the client that was dragged
-      const sourceClients = updatedClients[clientStatus] || [];
-      const draggedClient = sourceClients.find(client => client.id === clientId);
-
-      if (draggedClient) {
-        // Remove the client from its source swimlane
-        updatedClients[clientStatus] = sourceClients.filter(client => client.id !== clientId);
-
-        // Update the status and add the client to the target swimlane
-        draggedClient.status = newSwimlaneName;
-        if (!updatedClients[newSwimlaneName]) {
-          updatedClients[newSwimlaneName] = [];
-        }
-        updatedClients[newSwimlaneName].push(draggedClient);
-
-        // Update the state
-        this.setState({ clients: updatedClients });
-      }
-    });
-
-
-  }   
-
-
   getClients() {
     return [
       ['1','Stark, White and Abbott','Cloned Optimal Architecture', 'in-progress'],
@@ -92,13 +52,33 @@ export default class Board extends React.Component {
       status: companyDetails[3],
     }));
   }
+  componentDidMount() {
+    this.dragAndDrop();
+  }
 
   renderSwimlane(name, clients, ref) {
     return (
       <Swimlane name={name} clients={clients}  dragulaRef={ref}/>
     );
   }
-
+  dragAndDrop(){
+    let tasks = Object.values(this.swimlanes).map(i => i.current);
+    this.drake = Dragula(tasks);
+    this.drake.on('drop',(x,y) =>{
+      let position = y.previousSibling.innerText;
+      switch(position){
+        case 'In Progress':
+          x.className = 'Card Card-blue';
+          break;
+        case 'Backlog':
+          x.className = 'Card Card-grey';
+          break;
+        case 'Complete':
+          x.className = 'Card Card-green';
+          break;
+      }
+    });
+  }
   render() {
     return (
       <div className="Board">
